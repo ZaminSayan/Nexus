@@ -4,27 +4,17 @@
   <meta charset="UTF-8">
   <link rel="stylesheet" href="style.css">
   <title>Nexus</title>
-  <style>
-    body {
-      margin: 0;
-      background: #0f0f1a;
-      color: white;
-      font-family: Arial, sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-    }
-
-    h1 {
-      font-size: 32px;
-    }
-  </style>
 </head>
 <body>
+  <!-- Navbar -->
+  <div class="navbar">
+    <h1>Nexus</h1>
+  </div>
 
-  <div id="chat"></div>
+  <!-- Chat area -->
+  <div id="chat" class="chat-container"></div>
 
+  <!-- Input -->
   <div class="input-container">
     <input 
       type="text"
@@ -35,51 +25,5 @@
   </div>
 
   <script src="renderer.js"></script>
-
-  <script>
-    const chat = document.getElementById("chat");
-    const inputField = document.getElementById("commandInput");
-
-    function addMessage(sender, text) {
-      const message = document.createElement("div");
-      message.classList.add("message");
-      message.innerHTML = "<b>" + sender + ":</b> " + text;
-      chat.appendChild(message);
-      chat.scrollTop = chat.scrollHeight;
-    }
-
-    async function runCommand() {
-      const input = inputField.value.trim();
-      if (!input) return;
-
-      addMessage("You", input);
-      const response = await sendCommand(input);
-      addMessage("Nexus", response);
-
-      inputField.value = "";
-      inputField.focus();
-    }
-
-    inputField.addEventListener("keydown", function(e) {
-      if (e.key === "Enter") {
-        runCommand();
-      }
-    });
-
-    function addMessage(text, sender) {
-    const chat = document.getElementById("chat");
-
-    const message = document.createElement("div");
-    message.classList.add("message", sender);
-    message.innerText = text;
-
-    chat.appendChild(message);
-  }
-    addMessage(input, "user");
-    addMessage(response.response, "nexus");
-
-    window.onload = () => inputField.focus();
-  </script>
-
 </body>
 </html>

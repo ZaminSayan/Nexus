@@ -1,9 +1,9 @@
+// main.js
 const { spawn } = require('child_process');
-let pythonProcess = null;
-
-// frontend/main.js
 const { app, BrowserWindow } = require('electron');
 const path = require('path');
+
+let pythonProcess = null;
 
 function createWindow() {
   const win = new BrowserWindow({
@@ -13,34 +13,25 @@ function createWindow() {
     minHeight: 600,
     backgroundColor: '#0f0f1a',
     title: 'Nexus',
-    icon: path.join(__dirname, 'icon.png'), // optional: add an icon later
+    icon: path.join(__dirname, 'icon.png'),
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
-      nodeIntegration: false,       // security: disabled
-      contextIsolation: true,       // security: enabled
-      enableRemoteModule: false     // extra security
+      nodeIntegration: false,
+      contextIsolation: true,
+      enableRemoteModule: false
     }
   });
 
-  // Load the UI
   win.loadFile(path.join(__dirname, 'index.html'));
-
-  // Open DevTools automatically during development (comment out when done)
-  win.webContents.openDevTools();
-
-  // Optional: Prevent garbage collection issues on macOS
-  win.on('closed', () => {
-    win = null;
-  });
 }
 
-// When Electron is ready to launch
 app.whenReady().then(() => {
 
-  // Start Python backend
+  // Start Python backend silently
   pythonProcess = spawn('python', ['backend/app.py'], {
     cwd: path.join(__dirname, '..'),
-    shell: true
+    shell: true,
+    windowsHide: true   // <-- Hides the Python console
   });
 
   pythonProcess.stdout.on('data', (data) => {
@@ -54,13 +45,7 @@ app.whenReady().then(() => {
   createWindow();
 });
 
-// Quit when all windows are closed (except on macOS)
 app.on('window-all-closed', () => {
-  if (pythonProcess) {
-    pythonProcess.kill();
-  }
-
-  if (process.platform !== 'darwin') {
-    app.quit();
-  }
+  if (pythonProcess) pythonProcess.kill();
+  if (process.platform !== 'darwin') app.quit();
 });

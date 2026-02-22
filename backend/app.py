@@ -1,61 +1,41 @@
+# backend/app.py
 from flask import Flask, request, jsonify
-import subprocess
+from flask_cors import CORS
 import datetime
 import random
-import os
-import webbrowser
+
+# import command modules
+from commands.open_command import handle_open
+from commands.system_command import handle_system
+from commands.utility_command import handle_utility
 
 app = Flask(__name__)
+CORS(app)
+
+@app.route("/")
+def home():
+    return jsonify({"status": "running"})
 
 @app.route("/command", methods=["POST"])
 def command():
     data = request.json
     user_input = data.get("command", "").lower().strip()
 
-    # OPEN APPLICATIONS
-    if "open brave" in user_input:
-        subprocess.Popen(r"C:\Program Files\BraveSoftware\Brave-Browser\Application\brave.exe")
-        return jsonify({"response": "Brave is ready. Explore wisely."})
+    # try open commands
+    result = handle_open(user_input)
+    if result: return jsonify({"response": result})
 
-    if "open notepad" in user_input:
-        subprocess.Popen("notepad.exe")
-        return jsonify({"response": "Notepad opened. Time to write history."})
+    # try system commands (time/date/calc)
+    result = handle_system(user_input)
+    if result: return jsonify({"response": result})
 
-    # TIME & DATE
-    if "time" in user_input:
-        current_time = datetime.datetime.now().strftime("%I:%M %p")
-        return jsonify({"response": f"It is currently {current_time}."})
+    # try utility commands (search/joke)
+    result = handle_utility(user_input)
+    if result: return jsonify({"response": result})
 
-    if "date" in user_input:
-        today = datetime.datetime.now().strftime("%A, %B %d, %Y")
-        return jsonify({"response": f"Today is {today}."})
-
-    # CALCULATOR
-    if user_input.startswith("calculate"):
-        try:
-            expression = user_input.replace("calculate", "").strip()
-            result = eval(expression)
-            return jsonify({"response": f"The answer is {result}."})
-        except:
-            return jsonify({"response": "That calculation confused me. Try again."})
-
-    # SEARCH
-    if user_input.startswith("search"):
-        query = user_input.replace("search", "").strip()
-        webbrowser.open(f"https://www.google.com/search?q={query}")
-        return jsonify({"response": f"Searching for {query}."})
-
-    # JOKE
-    if "joke" in user_input:
-        jokes = [
-            "Why do programmers prefer dark mode? Because light attracts bugs.",
-            "Why did the computer get cold? It forgot to close Windows.",
-            "I would tell you a UDP joke... but you might not get it."
-        ]
-        return jsonify({"response": random.choice(jokes)})
-
-    # GREETINGS
-    if any(word in user_input for word in ["hi", "hello", "hey"]):
-        return jsonify({"response": "Hello. I'm Nexus. What shall we build today?"})
-
+    # fallback
     return jsonify({"response": "I am not sure how to respond to that yet."})
+
+if __name__ == "__main__":
+    print("Starting Nexus backend on http://localhost:5000")
+    app.run(port=5000)
