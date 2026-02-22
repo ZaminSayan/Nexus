@@ -1,0 +1,14 @@
+{
+  "name": "nexus",
+  "version": "1.0.0",
+  "description": "Personal AI Assistant using Electron for frontend and Python/Flask for backend",
+  "main": "frontend/main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "author": "Muhammed Zamin Sayan",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^31.7.7"
+  }
+}
